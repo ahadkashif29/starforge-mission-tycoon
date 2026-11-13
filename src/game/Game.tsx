@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useGame } from "./store";
 import * as THREE from "three";
-import { flightRuntime } from "./runtime";
+import { flightInput, flightRuntime } from "./runtime";
 import { sceneRefs } from "./scene/sceneRefs";
 import { GameCanvas } from "./scene/GameCanvas";
 import { TopBar } from "./ui/common";
@@ -21,6 +21,7 @@ export function Game() {
     if (import.meta.env.DEV) (window as unknown as { __game: unknown }).__game = {
         store: useGame,
         flight: flightRuntime,
+        input: flightInput,
         /** World point -> client pixel coords, for scripted drag checks. */
         project: (x: number, y: number, z: number) => {
           const cam = sceneRefs.camera;
