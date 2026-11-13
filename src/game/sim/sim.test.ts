@@ -80,11 +80,3 @@ describe("flight", () => {
   });
 });
 
-describe("predictions (calibration print)", () => {
-  it("prints", () => {
-    for (const [n, st, m, a] of [["oe", STARTER, oe, 45], ["rp", RED, rp, 60], ["ds", DEEP, ds, 72], ["oe-starter-rp", STARTER, rp, 60]] as const) {
-      const p = predict([...st], m, 1, a);
-      console.log(n, Math.round(p.achievableDv), m.requiredDv, p.liftoffTwr.toFixed(2));
-    }
-  });
-});
