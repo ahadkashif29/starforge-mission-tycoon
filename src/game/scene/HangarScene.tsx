@@ -152,7 +152,9 @@ function DragController() {
     plane.setFromNormalAndCoplanarPoint(normal, startPos);
     document.body.style.cursor = "grabbing";
 
+    let moved = false;
     const move = (e: PointerEvent) => {
+      moved = true;
       const r = gl.domElement.getBoundingClientRect();
       ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
       ray.setFromCamera(ndc, camera);
@@ -176,8 +178,14 @@ function DragController() {
     const up = () => {
       const st = useGame.getState();
       const uid = draggingUid;
-      if (dragState.snap) st.attach(uid, dragState.snap);
-      else st.dropLoose(uid, dragState.pos.x, dragState.pos.z);
+      if (!moved) useGame.setState({ draggingUid: null });
+      else if (dragState.snap) st.attach(uid, dragState.snap);
+      else {
+        // Keep loose parts clear of the mount.
+        let { x, z } = dragState.pos;
+        if (Math.abs(x) < 1.6 && Math.abs(z) < 1.6) x = x < 0 ? -2.4 : 2.4;
+        st.dropLoose(uid, x, z);
+      }
       dragState.uid = null;
       dragState.partId = null;
       dragState.snap = null;
