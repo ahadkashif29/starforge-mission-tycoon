@@ -145,6 +145,7 @@ function DragController() {
     const plane = new THREE.Plane();
     const hit = new THREE.Vector3();
     const normal = new THREE.Vector3();
+    const P = new THREE.Vector3();
     const startPos = new THREE.Vector3(dragState.pos.x, dragState.pos.y, dragState.pos.z);
     camera.getWorldDirection(normal);
     normal.y = 0;
@@ -165,14 +166,19 @@ function DragController() {
       dragState.pos = { x: hit.x, y, z: hit.z };
       const st = useGame.getState();
       const stack = stackWithout(st.stack, draggingUid);
-      const horiz = Math.hypot(hit.x, hit.z);
-      const bottomY = y - h / 2;
+      // Snap in screen space: what the player sees lining up is what counts.
+      const px = (x: number, yy: number, z: number) => {
+        P.set(x, yy, z).project(camera);
+        return [((P.x + 1) / 2) * r.width, ((1 - P.y) / 2) * r.height] as const;
+      };
+      const dist = (a: readonly [number, number], b: readonly [number, number]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
       const topY = stackTopY(stack);
+      const partBottom = px(hit.x, y - h / 2, hit.z);
+      const partCenter = px(hit.x, y, hit.z);
       let snap: typeof dragState.snap = null;
-      if (stack.length === 0) {
-        if (horiz < 1.8 && bottomY < MOUNT_Y + 1.6) snap = "top";
-      } else if (horiz < 1.7 && Math.abs(bottomY - topY) < 1.1) snap = "top";
-      else if (horiz < 2.0 && bottomY < MOUNT_Y + 0.9) snap = "bottom";
+      const SNAP_PX = Math.max(60, r.height * 0.08);
+      if (dist(partBottom, px(0, topY, 0)) < SNAP_PX) snap = "top";
+      else if (stack.length > 0 && dist(partCenter, px(0, MOUNT_Y + h / 2, 0)) < SNAP_PX) snap = "bottom";
       dragState.snap = snap;
     };
     const up = () => {
