@@ -56,7 +56,7 @@ export function TopBar() {
   );
 }
 
-export function Stat({ label, value, unit, tone }: { label: string; value: string; unit?: string; tone?: "primary" | "accent" | "warn" | "bad" | "good" }) {
+export function Stat({ label, value, unit, tone }: { label: string; value: string; unit?: string | undefined; tone?: "primary" | "accent" | "warn" | "bad" | "good" | undefined }) {
   return (
     <div className="rounded-md border border-border bg-background/40 px-3 py-2">
       <div className="hud-label">{label}</div>

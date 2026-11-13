@@ -12,7 +12,7 @@ function ReadySignal({ wrapper }: { wrapper: React.RefObject<HTMLDivElement | nu
   const frames = useRef(0);
   useFrame(() => {
     frames.current++;
-    if (frames.current === 2 && wrapper.current) wrapper.current.dataset.sceneReady = "1";
+    if (frames.current === 2 && wrapper.current) wrapper.current.setAttribute("data-scene-ready", "1");
   });
   return null;
 }

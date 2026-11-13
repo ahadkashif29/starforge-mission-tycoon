@@ -117,12 +117,18 @@ export const useGame = create<GameState>()(
       startDrag: (id) => set({ draggingUid: id }),
       dropLoose: (id, x, z) => {
         const t = take(get(), id);
-        if (!t) return set({ draggingUid: null });
+        if (!t) {
+          set({ draggingUid: null });
+          return;
+        }
         set({ stack: t.stack, loose: [...t.loose, { uid: id, partId: t.partId, x: clampX(x), z: clampZ(z) }], draggingUid: null });
       },
       attach: (id, where) => {
         const t = take(get(), id);
-        if (!t) return set({ draggingUid: null });
+        if (!t) {
+          set({ draggingUid: null });
+          return;
+        }
         const part = { uid: id, partId: t.partId };
         set({ stack: where === "top" ? [part, ...t.stack] : [...t.stack, part], loose: t.loose, draggingUid: null });
       },

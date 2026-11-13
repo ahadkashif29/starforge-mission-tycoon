@@ -385,7 +385,7 @@ function Asteroid({ sim, v }: { sim: FlightState; v: Visual }) {
   const passT = useRef(0);
   const geo = useMemo(() => {
     const g = new THREE.IcosahedronGeometry(1, 3);
-    const pos = g.attributes.position!;
+    const pos = g.getAttribute("position");
     const vec = new THREE.Vector3();
     for (let i = 0; i < pos.count; i++) {
       vec.fromBufferAttribute(pos, i);
