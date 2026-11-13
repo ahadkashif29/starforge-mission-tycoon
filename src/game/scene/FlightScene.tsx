@@ -401,7 +401,7 @@ function Asteroid({ sim, v }: { sim: FlightState; v: Visual }) {
     const g = ref.current;
     if (!g) return;
     const a = sim.asteroid;
-    g.visible = a.state === "incoming" || (a.state === "passed" && passT.current < 3) || (a.state === "hit" && false);
+    g.visible = a.state === "incoming" || (a.state === "passed" && passT.current < 3);
     if (a.state === "passed") passT.current += Math.min(delta, 0.05);
     const dist = a.state === "incoming" ? a.timeToImpact * 14 : -passT.current * 14;
     g.position.copy(v.rocketPos).sub(TMP2.copy(v.right).multiplyScalar(sim.lateralX)).addScaledVector(v.heading, dist + v.height * 0.5).addScaledVector(v.right, a.laneX);
@@ -593,15 +593,6 @@ function CameraRig({ sim, v }: { sim: FlightState; v: Visual }) {
   const pos = useMemo(() => new THREE.Vector3(), []);
   const shakeOff = useMemo(() => new THREE.Vector3(), []);
   const init = useRef(false);
-  useEffect(() => {
-    const cam = camera as THREE.PerspectiveCamera;
-    cam.far = 6000;
-    cam.updateProjectionMatrix();
-    return () => {
-      cam.far = 200;
-      cam.updateProjectionMatrix();
-    };
-  }, [camera]);
   useFrame((state, delta) => {
     const dt = Math.min(delta, 0.05);
     camera.position.sub(shakeOff);

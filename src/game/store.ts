@@ -38,6 +38,8 @@ interface GameState {
   lastResult: MissionResult | null;
   completed: string[];
   muted: boolean;
+  hubFocus: string | null;
+  setHubFocus: (id: string | null) => void;
 
   setScreen: (s: Screen) => void;
   selectMission: (id: string) => void;
@@ -86,6 +88,8 @@ export const useGame = create<GameState>()(
       lastResult: null,
       completed: [],
       muted: false,
+      hubFocus: null,
+      setHubFocus: (hubFocus) => set({ hubFocus }),
 
       setScreen: (screen) => set({ screen }),
       selectMission: (missionId) => set({ missionId, screen: "hangar" }),
