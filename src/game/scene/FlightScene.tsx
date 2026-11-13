@@ -403,14 +403,14 @@ function Asteroid({ sim, v }: { sim: FlightState; v: Visual }) {
     const a = sim.asteroid;
     g.visible = a.state === "incoming" || (a.state === "passed" && passT.current < 3);
     if (a.state === "passed") passT.current += Math.min(delta, 0.05);
-    const dist = a.state === "incoming" ? a.timeToImpact * 14 : -passT.current * 14;
+    const dist = a.state === "incoming" ? a.timeToImpact * 7 : -passT.current * 7;
     g.position.copy(v.rocketPos).sub(TMP2.copy(v.right).multiplyScalar(sim.lateralX)).addScaledVector(v.heading, dist + v.height * 0.5).addScaledVector(v.right, a.laneX);
     g.position.z = 0;
     g.rotation.x += delta * 0.9;
     g.rotation.y += delta * 0.6;
   });
   return (
-    <group ref={ref} visible={false} scale={1.1}>
+    <group ref={ref} visible={false} scale={1.3}>
       <mesh geometry={geo}>
         <meshStandardMaterial map={map} roughness={0.95} metalness={0.05} flatShading />
       </mesh>
@@ -567,7 +567,10 @@ function TargetPlanet({ missionId, v }: { missionId: string; v: Visual }) {
     g.rotation.y += delta * 0.05;
   });
   const glow = mission.planet === "earth" ? "#8fc0ff" : mission.planet === "mars" ? "#ffae80" : "#bfeaff";
+  const sunPos = useMemo(() => start.clone().addScaledVector(v.heading, -420).add(new THREE.Vector3(0, 150, 220)), [start, v]);
   return (
+    <>
+    <pointLight position={sunPos} intensity={3.2} decay={0} distance={0} color="#fff3e2" />
     <group ref={ref}>
       <mesh rotation={[0.2, 0, 0.3]}>
         <sphereGeometry args={[110, 96, 64]} />
@@ -584,6 +587,7 @@ function TargetPlanet({ missionId, v }: { missionId: string; v: Visual }) {
         </mesh>
       )}
     </group>
+    </>
   );
 }
 
@@ -602,9 +606,12 @@ function CameraRig({ sim, v }: { sim: FlightState; v: Visual }) {
     if (sim.phase === "countdown" || (sim.phase === "ascent" && !sim.lifted)) {
       pos.set(dist * 0.55, H * 0.25 + 1.5, dist * 0.9);
     } else if (sim.phase === "approach" || (sim.phase === "done" && sim.success)) {
-      pos.copy(center).addScaledVector(v.heading, -dist * 1.2).add(TMP2.set(dist * 0.6, dist * 0.25, dist * 1.4));
+      pos.copy(center).addScaledVector(v.heading, -dist * 1.1).addScaledVector(v.right, dist * 0.35).add(TMP2.set(0, 0, dist * 0.55));
     } else if (sim.phase === "exploding" || sim.phase === "done") {
       pos.copy(v.failPos).add(TMP2.set(dist * 1.1, dist * 0.3, dist * 1.6));
+    } else if (sim.asteroid.state === "incoming") {
+      // Pull back so the incoming rock is in frame.
+      pos.copy(center).add(TMP2.set(dist * 0.9, -H * 0.2, dist * 2.1)).addScaledVector(v.heading, -H * 0.4);
     } else {
       pos.copy(center).add(TMP2.set(dist * 0.45, -H * 0.15, dist)).addScaledVector(v.heading, -H * 0.2);
     }
@@ -614,7 +621,8 @@ function CameraRig({ sim, v }: { sim: FlightState; v: Visual }) {
     }
     camera.position.lerp(pos, 1 - Math.exp(-2.5 * dt));
     let target = center;
-    if (sim.phase === "approach" || (sim.phase === "done" && sim.success)) target = TMP2.copy(center).lerp(v.planetPos.clone().multiplyScalar(0.4), 0.25 * v.approachT);
+    if (sim.phase === "approach" || (sim.phase === "done" && sim.success)) target = TMP2.copy(center).addScaledVector(v.heading, dist * 2 * v.approachT);
+    else if (sim.asteroid.state === "incoming") target = TMP2.copy(center).addScaledVector(v.heading, 7);
     else if (sim.phase === "exploding" || (sim.phase === "done" && !sim.success)) target = v.failPos;
     look.lerp(target, 1 - Math.exp(-4 * dt));
     camera.lookAt(look);
