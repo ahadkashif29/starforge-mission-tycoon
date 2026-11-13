@@ -242,11 +242,15 @@ export function planetTexture(kind: PlanetKind) {
         const i = (y * 1024 + x) * 4;
         let r = 0, g = 0, b = 0;
         if (kind === "earth") {
-          if (lat > 0.86) [r, g, b] = [235, 240, 245];
-          else if (v > 0.55) [r, g, b] = [70 + v * 70, 110 + v * 50, 50 + v * 20];
-          else [r, g, b] = [18 + v * 30, 60 + v * 60, 120 + v * 70];
-          const cloud = d(x * 1.7 + 300, y * 1.7);
-          if (cloud > 0.68) [r, g, b] = [r * 0.3 + 178, g * 0.3 + 178, b * 0.3 + 178];
+          const land = Math.max(0, Math.min(1, (v - 0.52) / 0.06));
+          r = 20 + v * 25 + land * (60 + v * 50);
+          g = 58 + v * 40 + land * (40 + v * 30);
+          b = 120 + v * 50 - land * (90 + v * 40);
+          if (lat > 0.88) [r, g, b] = [230, 236, 242];
+          const cloud = Math.max(0, Math.min(1, (d(x * 1.7 + 300, y * 1.7) - 0.66) / 0.14)) * 0.8;
+          r += (240 - r) * cloud;
+          g += (244 - g) * cloud;
+          b += (248 - b) * cloud;
         } else if (kind === "mars") {
           [r, g, b] = [150 + v * 70, 70 + v * 40, 40 + v * 20];
           if (lat > 0.9) [r, g, b] = [230, 220, 210];
