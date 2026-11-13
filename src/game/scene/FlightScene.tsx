@@ -211,7 +211,7 @@ function World({ v }: { v: Visual }) {
   return (
     <group ref={ref}>
       <group position={[0, -MOUNT_Y, 0]}>
-        <Pad />
+        <Pad ground="field" />
       </group>
       <mesh position={[0, -400.95, 0]}>
         <sphereGeometry args={[400, 96, 64]} />
@@ -444,7 +444,7 @@ function Explosion({ sim, ids, ys, v }: { sim: FlightState; ids: string[]; ys: n
         off: new THREE.Vector3((Math.random() - 0.5) * 2.5, (Math.random() - 0.5) * v.height * 0.8, (Math.random() - 0.5) * 2.5),
         delay: k * 0.05 + Math.random() * 0.15,
         size: 1.8 + Math.random() * 2.6,
-        color: k % 3 === 0 ? "#fff3c8" : k % 3 === 1 ? "#ffb347" : "#ff5a1a",
+        color: k % 4 === 0 ? "#ffe2a0" : k % 4 === 1 ? "#ff9a3a" : k % 4 === 2 ? "#ff5a1a" : "#c2300f",
       })),
     [v],
   );
@@ -486,7 +486,7 @@ function Explosion({ sim, ids, ys, v }: { sim: FlightState; ids: string[]; ys: n
       const s = b.size * (1 - Math.exp(-lt * 5)) * (1 + lt * 0.4);
       mesh.position.copy(v.failPos).add(b.off).addScaledVector(TMP.set(0, 1, 0), lt * 1.2);
       mesh.scale.setScalar(Math.max(0.001, s));
-      (mesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 1 - lt / 1.6);
+      (mesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.6 * (1 - lt / 1.6));
     });
     smokeRefs.current.forEach((mesh, k) => {
       if (!mesh) return;

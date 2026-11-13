@@ -5,7 +5,7 @@ import { DECK_X, DECK_Z } from "../store";
 export const MOUNT_Y = 0.5;
 
 /** Launch deck, mount clamp, gantry tower and floodlights. */
-export function Pad() {
+export function Pad({ ground = "hangar" }: { ground?: "hangar" | "field" }) {
   const deck = useMemo(() => deckTexture(), []);
   return (
     <group>
@@ -15,8 +15,8 @@ export function Pad() {
       </mesh>
       {/* ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.41, 0]} receiveShadow>
-        <circleGeometry args={[60, 48]} />
-        <meshStandardMaterial color="#1b1f26" roughness={1} />
+        <circleGeometry args={[ground === "field" ? 260 : 60, 48]} />
+        <meshStandardMaterial color={ground === "field" ? "#56683f" : "#1b1f26"} roughness={1} />
       </mesh>
       {/* mount */}
       <mesh position={[0, MOUNT_Y / 2, 0]} castShadow receiveShadow>
